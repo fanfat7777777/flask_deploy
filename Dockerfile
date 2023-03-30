@@ -1,13 +1,15 @@
-FROM python:3.8.10-buster
+FROM python:3.8-alpine
 
-WORKDIR /app
+COPY requirements.txt ./
+COPY dev_config.json ./
 
-COPY requirements.txt requirements.txt
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install --no-cache --user -r requirements.txt
-
+WORKDIR /usr/src/app
 COPY . .
 
-EXPOSE 5000
 
-CMD ["python3", "-m" , "flask", "run", "--host=0.0.0.0"]
+EXPOSE 8000
+
+CMD gunicorn -b 0.0.0.0:8000 wsgi:app
